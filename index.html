@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    
+    <title>Stations Map and Time Series</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.3/dist/leaflet.css" integrity="sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ==" crossorigin="" /> 
+    <script src="https://unpkg.com/leaflet@1.3.3/dist/leaflet.js" integrity="sha512-tAGcCfR4Sc5ZP5ZoVz0quoZDYX5aCtEm/eu1KhSLj2c9eFrylXZknQYmxUssFaVJKvvc0dJQixhGjG2yXWiV9Q==" crossorigin=""></script> 
+    
+    <!--<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin=""/> -->
+    <!--<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script> -->
+    
+    <link rel="stylesheet" href="./static/css/style.css" />
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> 
+    <!--<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous"> -->
+
+    <script src="https://unpkg.com/simple-statistics@5.0.0/dist/simple-statistics.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.9.7/d3.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <!-- <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet"> -->
+    
+    <link rel="shortcut icon" href="#"> 
+
+  </head>
+  
+  <style>
+  .tam{height:30px;}
+  .color{background-color: #F2F0F0;}
+  .tam2{width:75%;}
+  </style>
+  
+  <body>
+    <div class="container-md">
+
+      <div class="row">
+          <h1 class="text-center" ><strong> Gasoline and Diesel Prices in Mexico</strong></h1>
+      </div>
+      
+      <div class="row tam"></div>
+
+      <div class="row">
+          <div class="col-md-1 col-1"></div>
+              <h3 align="center"><strong>General context of prices</strong></h3>
+          </div>
+      <div class="row tam"></div>
+      
+      <div class="row center"> 
+        <div class="col-md-1 center"></div>
+        <div class="col-md-10 center">
+          <div id="time-serie" class="center"></div> 
+        </div>  
+      </div>
+
+      <div class="row center"> 
+        <div class="col-md-4">
+          <h3 align="center">Regular Gasoline</h3>
+          <div id="magna-map" class="col-md-4 center"  style = "width: 450px; height: 300px"></div>
+        </div>
+        
+        <div class="col-md-4">
+          <h3 align="center">Premium Gasoline</h3>
+          <div id="premium-map" class="col-md-4 center" style = "width: 450px; height: 300px"></div>
+        </div>
+
+        <div class="col-md-4">
+          <h3 align="center">Diesel</h3>
+          <div id="diesel-map" class="col-md-4 center" style = "width: 450px; height: 300px"></div>
+        </div>
+      </div>
+
+      <div class="row" style="height:50px"></div>
+
+      <div class="row">
+        <div class="col-md-1 col-lg-1"></div>
+        <div class="col-md-2 col-lg-2">
+          <div class="well color">
+            <h5 align="center">Select State:</h5>
+            <select id="selSubject"></select>
+          </div>
+        </div>
+        <div class="col-md-8 col-lg-8">
+          <div class="well color">
+            <h3 align="center"><strong>Prices at Service Stations</strong></h3>
+          </div>
+        </div>
+      </div>
+
+      <div class="row" style="height:10px"></div>
+
+    <div class="row">
+      <div class="col-md-1 col-lg-1"></div>
+        <div data-aos="fade-right">
+        <div class="col-md-4 col-lg-4">
+          <div id="NewMap">
+            <div id="map" style = "width: 450px; height: 350px"></div>
+          </div>
+        </div>
+        </div>
+
+      <div data-aos="fade-left">
+        <div class="plot col-md-5 col-lg-5" id="plotdiv" style = "width: 700px; height: 400px"></div>>
+      </div>
+    </div>
+
+    <div class="row" style="height:20px"></div>
+
+    <div class="row">
+        <div class="col-md-1 col-lg-1"></div>
+        <div class="panel panel-primary col-md-2 col-lg-2">
+          <div class="panel-heading">
+            <h2 class="panel-title text-center">Regular Gas Average Price</h2>
+          </div>
+          <div id="subject-info1" class="panel-body text-center dieselclass"><p id="text1"></p></div>
+        </div>
+        <div class="col-md-2 col-lg-2"></div>
+        <div class="panel panel-primary col-md-2 col-lg-2">
+          <div class="panel-heading">
+            <h2 class="panel-title text-center">Premium Gas Average Price</h2>
+          </div>
+          <div id="subject-info2" class="panel-body text-center"><p id="text2"></p></div>
+        </div>
+        <div class="col-md-2 col-lg-2"></div>
+        <div class="panel panel-primary col-md-2 col-lg-2">
+          <div class="panel-heading">
+            <h2 class="panel-title text-center">Diesel Average Price</h2>
+          </div>
+          <div id="subject-info3" class="panel-body text-center dieselclass"><p id="text3"></p></div>
+        </div>
+      </div>
+
+      <div data-aos="fade-right">
+      <div class="row">
+        <div class="col-md-4 col-lg-4">
+          <div id="gauge-magna" align="center"></div>
+        </div>
+        <div class="col-md-4 col-lg-4">
+          <div id="gauge-premium" align="center"></div>
+        </div>
+        <div class="col-md-4 col-lg-4">
+          <div id="gauge-dielsel" align="center"></div>
+        </div>
+      </div>
+
+
+
+
+
+     
+
+      </div>
+
+
+
+    </div>
+ 
+
+    <!-- JS Time Series  -->
+    <script type="text/javascript" src="static/js/Time-Series.js"></script>
+
+    <!-- API key -->
+    <script type="text/javascript" src="static/js/config.js"></script>
+
+    <!-- JS Map Stations -->
+    <script type="text/javascript" src="static/js/stations-map.js"></script>
+    
+    <!-- JS Map Stations and Bubble -->
+    <script type="text/javascript" src="static/js/bubble-map.js"></script> 
+
+    <script type="text/javascript" src="static/js/js_gauge-magna.js"></script> 
+    
+    <script type="text/javascript" src="static/js/js_gauge_premium.js"></script> 
+    
+    <script type="text/javascript" src="static/js/js_gauge_diesel.js"></script> 
+
+    <script type="text/javascript" src="static/js/Bar_graph.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    
+    <!-- <script> AOS.init(); </script> -->
+    
+  </body>
+
+</html>
